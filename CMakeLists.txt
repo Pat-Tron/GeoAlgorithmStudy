@@ -4,7 +4,10 @@ set(CMAKE_CXX_STANDARD 20)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-dev")
 #target_compile_options(${PROJECT_NAME} PRIVATE "-Wno-dev")
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME}
+    main.cpp
+    VTKViewer.h
+    tutorials/01_bottle.h)
 
 include(ThirdLibraryPaths.cmake)
 
