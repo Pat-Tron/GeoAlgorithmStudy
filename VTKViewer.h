@@ -44,11 +44,9 @@ public:
         iren->Start();
     }
 
-    void AddShape(const std::shared_ptr<BRepBuilderAPI_MakeShape> & mkShape) {
-        const TopoDS_Shape& shape = mkShape->Shape();
-
+    void AddShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) {
         vtkNew<IVtkTools_ShapeDataSource> occSource;
-        occSource->SetShape(new IVtkOCC_Shape(shape));
+        occSource->SetShape(new IVtkOCC_Shape(*shapePtr));
 
         vtkNew<vtkPolyDataMapper> mapper;
         mapper->SetInputConnection(occSource->GetOutputPort());
@@ -59,9 +57,9 @@ public:
         ren->AddActor(actor);
     }
 
-    void AddShapes(std::vector<std::shared_ptr<BRepBuilderAPI_MakeShape>> & mkShapes) {
-        for (const auto & mkShape : mkShapes) {
-            AddShape(mkShape);
+    void AddShapes(std::vector<std::shared_ptr<TopoDS_Shape>> & shapePtrs) {
+        for (const auto & shapePtr : shapePtrs) {
+            AddShape(shapePtr);
         }
     }
 

@@ -7,7 +7,8 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(${PROJECT_NAME}
     main.cpp
     VTKViewer.h
-    tutorials/01_bottle.h)
+    tutorials/01_bottle.h
+    tutorials/01_bottle.cpp)
 
 include(ThirdLibraryPaths.cmake)
 
