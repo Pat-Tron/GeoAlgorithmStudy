@@ -3,17 +3,21 @@
 #include <BRepPrimAPI_MakeBox.hxx>
 
 // VTK Viewer
-#include "VTKViewer.h"
+#include "QtDriver.h"
 
 // STD
 #include <vector>
 #include <memory>
+
+// Qt
+#include <QVTKOpenGLNativeWidget.h>
 
 // Tutorials
 #include "tutorials/01_bottle.h"
 
 int main(int argc, char** argv)
 {
+
     unsigned whichTest {0};
     if (argc == 1) {
         whichTest = 0;
@@ -35,9 +39,16 @@ int main(int argc, char** argv)
         default: break;
     }
 
-    VTKViewer myViewer(1200, 600, "Bottle");
-    myViewer.AddShapes(geoPrims);
-    myViewer.Start();
+    // QT Stuff
+    QSurfaceFormat::setDefaultFormat(QVTKOpenGLNativeWidget::defaultFormat());
+    QApplication app(argc, argv);
 
-    return EXIT_SUCCESS;
+    RenderWindowUISingleInheritance qwindow;
+    qwindow.AddShapes(geoPrims);
+//    qwindow.viewer.Start();
+    qwindow.show();
+    return app.exec();
+
+
+
 }

@@ -1,14 +1,17 @@
 // VTK
 #include <vtkActor.h>
 #include <vtkColor.h>
-#include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkNamedColors.h>
 #include <vtkNew.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkRenderWindow.h>
+#include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 #include <vtkPolyDataMapper.h>
+
+#include <vtkCamera.h>
+#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkInteractorStyleTerrain.h>
 
 // IVtk
 #include <IVtkTools_ShapeDataSource.hxx>
@@ -25,26 +28,28 @@
 
 class VTKViewer {
 public:
-    VTKViewer(int width, int height, const char* windowName) {
+    VTKViewer() {
         vtkNew<vtkNamedColors> colors;
         ren->SetBackground(colors->GetColor3d("CornflowerBlue").GetData());
-
-        vtkNew<vtkRenderWindow> renWin;
         renWin->AddRenderer(ren);
-        renWin->SetSize(width, height);
-        renWin->SetWindowName(windowName);
-
         iren->SetRenderWindow(renWin);
 
-        vtkNew<vtkInteractorStyleTrackballCamera> style;
+        vtkNew<vtkCamera> camera;
+        camera->SetPosition(0, 100, 0);
+        camera->SetFocalPoint(0, 0, 0);
+        camera->SetViewUp(0, 0, 1);
+        ren->SetActiveCamera(camera);
+
+//        vtkNew<vtkInteractorStyleTrackballCamera> style;
+        vtkNew<vtkInteractorStyleTerrain> style;
         iren->SetInteractorStyle(style);
     }
 
-    void Start() {
+    void Start() const {
         iren->Start();
     }
 
-    void AddShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) {
+    void AddShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) const {
         vtkNew<IVtkTools_ShapeDataSource> occSource;
         occSource->SetShape(new IVtkOCC_Shape(*shapePtr));
 
@@ -57,14 +62,14 @@ public:
         ren->AddActor(actor);
     }
 
-    void AddShapes(std::vector<std::shared_ptr<TopoDS_Shape>> & shapePtrs) {
+    void AddShapes(std::vector<std::shared_ptr<TopoDS_Shape>> & shapePtrs) const {
         for (const auto & shapePtr : shapePtrs) {
             AddShape(shapePtr);
         }
     }
 
-private:
     vtkNew<vtkRenderer> ren;
+    vtkNew<vtkGenericOpenGLRenderWindow> renWin;
     vtkNew<vtkRenderWindowInteractor> iren;
 };
 
