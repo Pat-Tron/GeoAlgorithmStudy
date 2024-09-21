@@ -46,11 +46,10 @@ public:
         ren->SetBackground(bottomColor.GetData()); // Color 1
         ren->SetBackground2(topColor.GetData()); // Color 2
 
-        // Set camera
-        vtkNew<vtkCamera> camera;
-        camera->SetPosition(0, 300, 0);
-        camera->SetFocalPoint(0, 0, 40);
+        // Camera
+        camera->SetFocalPoint(0, 0, 35);
         camera->SetViewUp(0, 0, 1);
+        camera->SetPosition(0, 200, 35);
         ren->SetActiveCamera(camera);
 
         // Axis actor
@@ -70,9 +69,9 @@ public:
         axesActor->GetXAxisCaptionActor2D()->GetTextActor()->SetTextScaleModeToViewport();
         axesActor->GetYAxisCaptionActor2D()->GetTextActor()->SetTextScaleModeToViewport();
         axesActor->GetZAxisCaptionActor2D()->GetTextActor()->SetTextScaleModeToViewport();
-        axesActor->GetXAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(20);
-        axesActor->GetYAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(20);
-        axesActor->GetZAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(20);
+        axesActor->GetXAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(30);
+        axesActor->GetYAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(30);
+        axesActor->GetZAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(30);
         axesActor->GetXAxisCaptionActor2D()->GetCaptionTextProperty()->ShadowOn();
         axesActor->GetYAxisCaptionActor2D()->GetCaptionTextProperty()->ShadowOn();
         axesActor->GetZAxisCaptionActor2D()->GetCaptionTextProperty()->ShadowOn();
@@ -82,6 +81,12 @@ public:
 
         orientationWidget->SetOrientationMarker(axesActor);
         orientationWidget->SetZoom(1.5);
+    }
+
+    void ResetCamera() {
+//        ren->ResetCameraScreenSpace(0.8);
+        ren->ResetCamera();
+        camera->SetViewUp(0, 0, 1);
     }
 
     void AddShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) const {
@@ -97,7 +102,7 @@ public:
         ren->AddActor(actor);
     }
 
-    void AddShapes(std::vector<std::shared_ptr<TopoDS_Shape>> & shapePtrs) const {
+    void AddShapes(std::vector<std::shared_ptr<TopoDS_Shape>> & shapePtrs) {
         for (const auto & shapePtr : shapePtrs) {
             AddShape(shapePtr);
         }
@@ -117,6 +122,7 @@ private:
     unsigned style = 0;
     vtkNew<vtkInteractorStyleTerrain> styleTerrain;
     vtkNew<vtkInteractorStyleTrackballCamera> styleTrackball;
+    vtkNew<vtkCamera> camera;
 
 public:
     vtkNew<vtkRenderer> ren;

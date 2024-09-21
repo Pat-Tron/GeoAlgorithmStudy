@@ -18,6 +18,7 @@
 
 int main(int argc, char** argv)
 {
+    vtkObject::GlobalWarningDisplayOff();
     VTKViewer viewer;
     viewer.AddShape(Bottle(70., 50., 22.).mainShapePtr);
 

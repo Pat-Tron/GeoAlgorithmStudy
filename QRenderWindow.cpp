@@ -22,7 +22,6 @@ QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
     viewer.orientationWidget->SetEnabled(1);
     viewer.orientationWidget->InteractiveOff();
 
-
     // Initialize interactor style.
     SwitchInteractorStyle(this);
 
@@ -30,6 +29,11 @@ QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
     connect(this->ui->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
     connect(this->ui->pushButton_CamStyle, &QPushButton::released,
             [&]() { SwitchInteractorStyle(this); });
+    connect(this->ui->pushButton_CamReset, &QPushButton::released,
+            [&]() {
+        viewer.ResetCamera();
+        this->ui->qvtkWidget->renderWindow()->Render();
+    });
 }
 
 
