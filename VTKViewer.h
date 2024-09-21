@@ -86,8 +86,7 @@ public:
     }
 
     void ResetCamera() {
-//        ren->ResetCameraScreenSpace(0.8);
-        ren->ResetCamera();
+        ren->ResetCameraScreenSpace(0.8);
         camera->SetViewUp(0, 0, 1);
     }
 
@@ -116,6 +115,18 @@ public:
         }
     }
 
+    const char * SwitchProjection() {
+        switch (projection) {
+            case 0: projection = 1; camera->ParallelProjectionOn();
+                return " Projection: Orthographic";
+            case 1: projection = 0; camera->ParallelProjectionOff();
+                return " Projection: Perspective";
+            default: return "";
+        }
+//        renderer->GetActiveCamera()->SetParallelScale(10);
+//        renderer->GetActiveCamera()->SetClippingRange(-1000, 1000);
+    }
+
     void AddShapes(std::vector<std::shared_ptr<TopoDS_Shape>> & shapePtrs) {
         for (const auto & shapePtr : shapePtrs) {
             AddShape(shapePtr);
@@ -135,6 +146,7 @@ public:
 private:
     unsigned style = 0;
     unsigned displayMode = 0;
+    unsigned projection = 0;
     vtkNew<vtkInteractorStyleTerrain> styleTerrain;
     vtkNew<vtkInteractorStyleTrackballCamera> styleTrackball;
     vtkNew<vtkCamera> camera;

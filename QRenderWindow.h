@@ -33,6 +33,7 @@ public slots:
 
     friend void SwitchInteractorStyle(QRenderWindow *qw);
     friend void SwitchDisplayMode(QRenderWindow *qw);
+    friend void SwitchProjection(QRenderWindow *qw);
 };
 
 

@@ -14,6 +14,12 @@ void SwitchDisplayMode(QRenderWindow *qw) {
     qw->ui->qvtkWidget->renderWindow()->Render();
 }
 
+void SwitchProjection(QRenderWindow *qw) {
+    qw->ui->pushButton_SwitchProjection->setText(qw->viewer.SwitchProjection());
+    qw->viewer.ResetCamera();
+    qw->ui->qvtkWidget->renderWindow()->Render();
+}
+
 QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
         : QMainWindow(parent), ui(new Ui::QRenderWindow), viewer(viewer){
     this->ui->setupUi(this);
@@ -41,6 +47,8 @@ QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
     });
     connect(this->ui->pushButton_SwitchDisplayMode, &QPushButton::released,
             [&]() { SwitchDisplayMode(this); });
+    connect(this->ui->pushButton_SwitchProjection, &QPushButton::released,
+            [&]() { SwitchProjection(this); });
 }
 
 
