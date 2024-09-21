@@ -32,6 +32,7 @@ public slots:
     void slotExit();
 
     friend void SwitchInteractorStyle(QRenderWindow *qw);
+    friend void SwitchDisplayMode(QRenderWindow *qw);
 };
 
 

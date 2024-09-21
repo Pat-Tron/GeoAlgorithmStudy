@@ -9,6 +9,11 @@ void SwitchInteractorStyle(QRenderWindow *qw) {
     qw->ui->pushButton_CamStyle->setText(std::get<0>(style));
 }
 
+void SwitchDisplayMode(QRenderWindow *qw) {
+    qw->ui->pushButton_SwitchDisplayMode->setText(qw->viewer.SwitchDisplayMode());
+    qw->ui->qvtkWidget->renderWindow()->Render();
+}
+
 QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
         : QMainWindow(parent), ui(new Ui::QRenderWindow), viewer(viewer){
     this->ui->setupUi(this);
@@ -34,6 +39,8 @@ QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
         viewer.ResetCamera();
         this->ui->qvtkWidget->renderWindow()->Render();
     });
+    connect(this->ui->pushButton_SwitchDisplayMode, &QPushButton::released,
+            [&]() { SwitchDisplayMode(this); });
 }
 
 

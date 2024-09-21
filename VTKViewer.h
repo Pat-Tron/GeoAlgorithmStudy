@@ -21,6 +21,8 @@
 
 // IVtk
 #include <IVtkTools_ShapeDataSource.hxx>
+#include <IVtkOCC_ShapeMesher.hxx>
+#include <IVtkTools_DisplayModeFilter.hxx>
 
 // OCCT
 #include <BRepBuilderAPI_MakeShape.hxx>
@@ -90,16 +92,28 @@ public:
     }
 
     void AddShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) const {
-        vtkNew<IVtkTools_ShapeDataSource> occSource;
-        occSource->SetShape(new IVtkOCC_Shape(*shapePtr));
+        DS->SetShape(new IVtkOCC_Shape(*shapePtr));
+
+        DMFilter->AddInputConnection(DS->GetOutputPort());
+        DMFilter->SetDisplayMode(DM_Shading);
 
         vtkNew<vtkPolyDataMapper> mapper;
-        mapper->SetInputConnection(occSource->GetOutputPort());
+        mapper->SetInputConnection(DMFilter->GetOutputPort());
 
         vtkNew<vtkActor> actor;
         actor->SetMapper(mapper);
 
         ren->AddActor(actor);
+    }
+
+    const char * SwitchDisplayMode() {
+        switch (displayMode) {
+            case 0: displayMode = 1; DMFilter->SetDisplayMode(DM_Wireframe);
+                return " DisplayMode: Wireframe";
+            case 1: displayMode = 0; DMFilter->SetDisplayMode(DM_Shading);
+                return " DisplayMode: Shading";
+            default: return "";
+        }
     }
 
     void AddShapes(std::vector<std::shared_ptr<TopoDS_Shape>> & shapePtrs) {
@@ -120,9 +134,12 @@ public:
 
 private:
     unsigned style = 0;
+    unsigned displayMode = 0;
     vtkNew<vtkInteractorStyleTerrain> styleTerrain;
     vtkNew<vtkInteractorStyleTrackballCamera> styleTrackball;
     vtkNew<vtkCamera> camera;
+    vtkNew<IVtkTools_ShapeDataSource> DS;
+    vtkNew<IVtkTools_DisplayModeFilter> DMFilter;
 
 public:
     vtkNew<vtkRenderer> ren;
