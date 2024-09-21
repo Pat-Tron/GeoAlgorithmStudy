@@ -6,7 +6,8 @@ set(CMAKE_AUTOUIC ON)
 
 include(ThirdLibraryPaths.cmake)
 
-add_executable(${PROJECT_NAME}
+# WIN32 indicate the exe don't display console window.
+add_executable(${PROJECT_NAME} WIN32
     main.cpp
     VTKViewer.h
     tutorials/01_bottle.h
@@ -16,13 +17,13 @@ add_executable(${PROJECT_NAME}
     RenderWindow.ui
 )
 
-
 # VTK
 find_package(VTK REQUIRED COMPONENTS
     CommonColor
     CommonCore
     FiltersSources
     RenderingCore
+    RenderingAnnotation
     InteractionStyle
     RenderingContextOpenGL2
     RenderingFreeType

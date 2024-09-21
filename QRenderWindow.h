@@ -26,9 +26,12 @@ public:
 
 private:
     Ui::QRenderWindow* ui;
+    VTKViewer & viewer;
 
 public slots:
     void slotExit();
+
+    friend void SwitchInteractorStyle(QRenderWindow *qw);
 };
 
 

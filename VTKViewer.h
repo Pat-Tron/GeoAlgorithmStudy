@@ -8,6 +8,12 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkAxesActor.h>
+#include <vtkOrientationMarkerWidget.h>
+#include <vtkCaptionActor2D.h>
+#include <vtkTextProperty.h>
+#include <vtkProperty.h>
+#include <vtkTextActor.h>
 
 #include <vtkCamera.h>
 #include <vtkInteractorStyleTrackballCamera.h>
@@ -22,6 +28,7 @@
 // STD
 #include <vector>
 #include <memory>
+#include <tuple>
 
 #ifndef GEOALGORITHMSTUDY_VTKVIEWER_H
 #define GEOALGORITHMSTUDY_VTKVIEWER_H
@@ -30,14 +37,51 @@
 class VTKViewer {
 public:
     VTKViewer() {
+        // Background color
         vtkNew<vtkNamedColors> colors;
-        ren->SetBackground(colors->GetColor3d("royal_blue").GetData());
+        const auto bottomColor = colors->GetColor3d("black");
+        const auto topColor = colors->GetColor3d("slate_blue_dark");
+        ren->GradientBackgroundOn(); // enable gradient backgrounds
+        ren->SetGradientMode(vtkRenderer::GradientModes::VTK_GRADIENT_VERTICAL);
+        ren->SetBackground(bottomColor.GetData()); // Color 1
+        ren->SetBackground2(topColor.GetData()); // Color 2
 
+        // Set camera
         vtkNew<vtkCamera> camera;
         camera->SetPosition(0, 300, 0);
         camera->SetFocalPoint(0, 0, 40);
         camera->SetViewUp(0, 0, 1);
         ren->SetActiveCamera(camera);
+
+        // Axis actor
+        vtkNew<vtkAxesActor> axesActor;
+        axesActor->GetXAxisTipProperty()->SetColor(0xac/255., 0xef/255., 0x7e/255.);
+        axesActor->GetXAxisShaftProperty()->SetColor(0xac/255., 0xef/255., 0x7e/255.);
+        axesActor->GetYAxisTipProperty()->SetColor(0xdb/255., 0x5c/255., 0x5c/255.);
+        axesActor->GetYAxisShaftProperty()->SetColor(0xdb/255., 0x5c/255., 0x5c/255.);
+        axesActor->GetZAxisTipProperty()->SetColor(0x2c/255., 0x88/255., 0xf3/255.);
+        axesActor->GetZAxisShaftProperty()->SetColor(0x2c/255., 0x88/255., 0xf3/255.);
+
+        axesActor->SetShaftType(0);
+        axesActor->SetNormalizedShaftLength(0.7, 0.7, 0.7);
+        axesActor->SetNormalizedTipLength(0.3, 0.3, 0.3);
+        axesActor->SetCylinderRadius(0.05);
+
+        axesActor->GetXAxisCaptionActor2D()->GetTextActor()->SetTextScaleModeToViewport();
+        axesActor->GetYAxisCaptionActor2D()->GetTextActor()->SetTextScaleModeToViewport();
+        axesActor->GetZAxisCaptionActor2D()->GetTextActor()->SetTextScaleModeToViewport();
+        axesActor->GetXAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(20);
+        axesActor->GetYAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(20);
+        axesActor->GetZAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(20);
+        axesActor->GetXAxisCaptionActor2D()->GetCaptionTextProperty()->ShadowOn();
+        axesActor->GetYAxisCaptionActor2D()->GetCaptionTextProperty()->ShadowOn();
+        axesActor->GetZAxisCaptionActor2D()->GetCaptionTextProperty()->ShadowOn();
+        axesActor->GetXAxisCaptionActor2D()->GetCaptionTextProperty()->SetShadowOffset(5, -5);
+        axesActor->GetYAxisCaptionActor2D()->GetCaptionTextProperty()->SetShadowOffset(5, -5);
+        axesActor->GetZAxisCaptionActor2D()->GetCaptionTextProperty()->SetShadowOffset(5, -5);
+
+        orientationWidget->SetOrientationMarker(axesActor);
+        orientationWidget->SetZoom(1.5);
     }
 
     void AddShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) const {
@@ -59,8 +103,25 @@ public:
         }
     }
 
+    std::tuple<const char *, vtkInteractorStyle*> GetSwitchStyle() {
+        switch (style) {
+            case 0: style = 1; return std::make_tuple<const char *, vtkInteractorStyle*>(
+                    " Current Style: Terrain", styleTerrain);
+            case 1: style = 0; return std::make_tuple<const char *, vtkInteractorStyle*>(
+                    " Current Style: Trackball", styleTrackball);
+            default: return std::make_tuple<const char *, vtkInteractorStyle*>(" Unknown", nullptr);
+        }
+    }
+
+private:
+    unsigned style = 0;
+    vtkNew<vtkInteractorStyleTerrain> styleTerrain;
+    vtkNew<vtkInteractorStyleTrackballCamera> styleTrackball;
+
+public:
     vtkNew<vtkRenderer> ren;
     vtkNew<vtkGenericOpenGLRenderWindow> renWin;
+    vtkNew<vtkOrientationMarkerWidget> orientationWidget;
 };
 
 
