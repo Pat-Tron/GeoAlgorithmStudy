@@ -26,27 +26,18 @@
 #ifndef GEOALGORITHMSTUDY_VTKVIEWER_H
 #define GEOALGORITHMSTUDY_VTKVIEWER_H
 
+
 class VTKViewer {
 public:
     VTKViewer() {
         vtkNew<vtkNamedColors> colors;
-        ren->SetBackground(colors->GetColor3d("CornflowerBlue").GetData());
-        renWin->AddRenderer(ren);
-        iren->SetRenderWindow(renWin);
+        ren->SetBackground(colors->GetColor3d("royal_blue").GetData());
 
         vtkNew<vtkCamera> camera;
-        camera->SetPosition(0, 100, 0);
-        camera->SetFocalPoint(0, 0, 0);
+        camera->SetPosition(0, 300, 0);
+        camera->SetFocalPoint(0, 0, 40);
         camera->SetViewUp(0, 0, 1);
         ren->SetActiveCamera(camera);
-
-//        vtkNew<vtkInteractorStyleTrackballCamera> style;
-        vtkNew<vtkInteractorStyleTerrain> style;
-        iren->SetInteractorStyle(style);
-    }
-
-    void Start() const {
-        iren->Start();
     }
 
     void AddShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) const {
@@ -70,7 +61,6 @@ public:
 
     vtkNew<vtkRenderer> ren;
     vtkNew<vtkGenericOpenGLRenderWindow> renWin;
-    vtkNew<vtkRenderWindowInteractor> iren;
 };
 
 

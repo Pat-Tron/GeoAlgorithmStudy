@@ -11,9 +11,9 @@ add_executable(${PROJECT_NAME}
     VTKViewer.h
     tutorials/01_bottle.h
     tutorials/01_bottle.cpp
-    QtDriver.cpp
-    QtDriver.h
-    RenderWindowUISingleInheritance.ui
+    QRenderWindow.h
+    QRenderWindow.cpp
+    RenderWindow.ui
 )
 
 
