@@ -136,9 +136,9 @@ public:
     std::tuple<const char *, vtkInteractorStyle*> GetSwitchStyle() {
         switch (style) {
             case 0: style = 1; return std::make_tuple<const char *, vtkInteractorStyle*>(
-                    " Current Style: Terrain", styleTerrain);
+                    " Current Inter Style: Terrain", styleTerrain);
             case 1: style = 0; return std::make_tuple<const char *, vtkInteractorStyle*>(
-                    " Current Style: Trackball", styleTrackball);
+                    " Current Inter Style: Trackball", styleTrackball);
             default: return std::make_tuple<const char *, vtkInteractorStyle*>(" Unknown", nullptr);
         }
     }
