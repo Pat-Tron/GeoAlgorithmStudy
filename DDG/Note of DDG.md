@@ -28,7 +28,7 @@
 #### **Star**
 > for any subset $\mathcal S$ of $\mathcal K$ (*not necessarily a subcomplex* ) , i.e. $St(\mathcal S)$
 - The collection of all simplices $\color{#8E7}{\sigma\in\mathcal{K}}$ such that for $\forall \sigma' \in \mathcal{S}, \color{#8E7}{\exists \sigma' \in\sigma}$.
-- May no be a **simplicial complex**, since there is no "bounary".
+- May no be a **simplicial complex**, since there is no "boundary".
 #### **Closure**
 > for any subset $\mathcal S$ of $\mathcal K$ (not necessarily a subcomplex) , i.e. $Cl(\mathcal S)$
 - The **smallest subcomplex** of $\mathcal{K}$ containing $\mathcal S$.
@@ -111,6 +111,7 @@ $$
 - $\eta(ij)=ji$
 #### **Next** function
 - $\rho(ij)=jk, \forall ijk\in \mathcal K$
+- orbits in **local** simplex
 #### **Orbit**
 - the **faces** are orbits of $\rho$
 - the **edges** are orbits of $\eta$
