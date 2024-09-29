@@ -14,7 +14,7 @@
 #include <vtkTextProperty.h>
 #include <vtkProperty.h>
 #include <vtkTextActor.h>
-
+#include <vtkLight.h>
 #include <vtkCamera.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkInteractorStyleTerrain.h>
@@ -27,6 +27,9 @@
 // OCCT
 #include <BRepBuilderAPI_MakeShape.hxx>
 
+// Tutorials
+#include "tutorials/01_bottle.h"
+
 // STD
 #include <vector>
 #include <memory>
@@ -34,6 +37,19 @@
 
 #ifndef GEOALGORITHMSTUDY_VTKVIEWER_H
 #define GEOALGORITHMSTUDY_VTKVIEWER_H
+
+
+enum class ProjectionMode
+{
+    Orthographic = 0,
+    Perspective = 1
+};
+
+enum class InteractorStyle
+{
+    Trackball = 0,
+    Terrain = 1
+};
 
 
 class VTKViewer {
@@ -83,6 +99,18 @@ public:
 
         orientationWidget->SetOrientationMarker(axesActor);
         orientationWidget->SetZoom(1.5);
+
+        // Lighting
+        vtkNew<vtkLight> light;
+        light->SetDirectionAngle(25, -10);
+        light->SetLightTypeToCameraLight();
+        ren->AddLight(light);
+
+        vtkNew<vtkLight> backLight;
+        backLight->SetDirectionAngle(-25, 90);
+        backLight->SetLightTypeToCameraLight();
+        backLight->SetColor(0.117, 0.871, 0.384);
+        ren->AddLight(backLight);
     }
 
     void ResetCamera() {
@@ -99,63 +127,78 @@ public:
     }
 
     void SetPipeline() const {
+        SetShape(bottle.mainShapePtr);
         DMFilter->AddInputConnection(DS->GetOutputPort());
         DMFilter->SetDisplayMode(DM_Shading);
 
         vtkNew<vtkPolyDataMapper> mapper;
         mapper->SetInputConnection(DMFilter->GetOutputPort());
+        mainActor->SetMapper(mapper);
 
-        vtkNew<vtkActor> actor;
-        actor->SetMapper(mapper);
+        ren->AddActor(mainActor);
+    }
 
-        ren->AddActor(actor);
+    void SwitchEdgeVisibility() {
+        static bool switcher {true};
+        if (switcher) mainActor->GetProperty()->EdgeVisibilityOn();
+        else mainActor->GetProperty()->EdgeVisibilityOff();
+        switcher = !switcher;
     }
 
     const char * SwitchDisplayMode() {
-        switch (displayMode) {
-            case 0: displayMode = 1; DMFilter->SetDisplayMode(DM_Wireframe);
-                return " DisplayMode: Wireframe";
-            case 1: displayMode = 0; DMFilter->SetDisplayMode(DM_Shading);
-                return " DisplayMode: Shading";
+        static IVtk_DisplayMode dm = DM_Shading;
+        dm = dm == DM_Shading ? DM_Wireframe : DM_Shading;
+        DMFilter->SetDisplayMode(dm);
+        switch (dm) {
+            case DM_Shading: return " DisplayMode: Shading";
+            case DM_Wireframe: return " DisplayMode: Wireframe";
             default: return "";
         }
     }
 
     const char * SwitchProjection() {
-        switch (projection) {
-            case 0: projection = 1; camera->ParallelProjectionOn();
+        static ProjectionMode pm { ProjectionMode::Perspective };
+        switch (pm) {
+            case ProjectionMode::Perspective:
+                pm = ProjectionMode::Orthographic;
+                camera->ParallelProjectionOn();
                 return " Projection: Orthographic";
-            case 1: projection = 0; camera->ParallelProjectionOff();
+            case ProjectionMode::Orthographic:
+                pm = ProjectionMode::Perspective;
+                camera->ParallelProjectionOff();
                 return " Projection: Perspective";
             default: return "";
         }
     }
 
     std::tuple<const char *, vtkInteractorStyle*> GetSwitchStyle() {
-        switch (style) {
-            case 0: style = 1; return std::make_tuple<const char *, vtkInteractorStyle*>(
-                    " Current Inter Style: Terrain", styleTerrain);
-            case 1: style = 0; return std::make_tuple<const char *, vtkInteractorStyle*>(
+        static InteractorStyle is { InteractorStyle::Trackball };
+        switch (is) {
+            case InteractorStyle::Trackball:
+                is = InteractorStyle::Terrain;
+                return std::make_tuple<const char *, vtkInteractorStyle*>(
+                        " Current Inter Style: Terrain", styleTerrain);
+            case InteractorStyle::Terrain:
+                is = InteractorStyle::Trackball;
+                return std::make_tuple<const char *, vtkInteractorStyle*>(
                     " Current Inter Style: Trackball", styleTrackball);
             default: return std::make_tuple<const char *, vtkInteractorStyle*>(" Unknown", nullptr);
         }
     }
 
 private:
-    unsigned style = 0;
-    unsigned displayMode = 0;
-    unsigned projection = 0;
     vtkNew<vtkInteractorStyleTerrain> styleTerrain;
     vtkNew<vtkInteractorStyleTrackballCamera> styleTrackball;
     vtkNew<vtkCamera> camera;
     vtkNew<IVtkTools_ShapeDataSource> DS;
     vtkNew<IVtkTools_DisplayModeFilter> DMFilter;
+    vtkNew<vtkActor> mainActor;
 
 public:
     vtkNew<vtkRenderer> ren;
     vtkNew<vtkGenericOpenGLRenderWindow> renWin;
     vtkNew<vtkOrientationMarkerWidget> orientationWidget;
+    Bottle bottle;
 };
-
 
 #endif //GEOALGORITHMSTUDY_VTKVIEWER_H

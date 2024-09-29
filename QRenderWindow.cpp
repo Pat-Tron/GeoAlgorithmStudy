@@ -38,6 +38,16 @@ void QRenderWindow::onLoadShape(QString path) {
     }
 }
 
+void QRenderWindow::onLoadBottle() {
+    viewer.SetShape(viewer.bottle.mainShapePtr);
+    onResetCamera();
+}
+
+void QRenderWindow::onSwitchEdgeVisibility() {
+    viewer.SwitchEdgeVisibility();
+    this->ui->qvtkWidget->renderWindow()->Render();
+}
+
 QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
         : QMainWindow(parent), ui(new Ui::QRenderWindow), viewer(viewer){
     this->ui->setupUi(this);
@@ -56,16 +66,20 @@ QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
 
     // Initialize signal slot.
     connect(this->ui->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
-    connect(this->ui->pushButton_CamStyle, &QPushButton::released,
-            [&]() { onSwitchInteractorStyle(); });
-    connect(this->ui->pushButton_CamReset, &QPushButton::released,
-            [&]() { onResetCamera(); });
-    connect(this->ui->pushButton_SwitchDisplayMode, &QPushButton::released,
-            [&]() { onSwitchDisplayMode(); });
-    connect(this->ui->pushButton_SwitchProjection, &QPushButton::released,
-            [&]() { onSwitchProjection(); });
-    connect(this->ui->pushButton_LoadBunny, &QPushButton::released,
-            [&]() { onLoadShape(this->ui->lineEdit_filePath->text()); });
+    connect(this->ui->pushButton_CamStyle, &QPushButton::released,[&]() {
+        onSwitchInteractorStyle(); });
+    connect(this->ui->pushButton_CamReset, &QPushButton::released,[&]() {
+        onResetCamera(); });
+    connect(this->ui->pushButton_SwitchDisplayMode, &QPushButton::released,[&]() {
+        onSwitchDisplayMode(); });
+    connect(this->ui->pushButton_SwitchProjection, &QPushButton::released,[&]() {
+        onSwitchProjection(); });
+    connect(this->ui->pushButton_LoadShape, &QPushButton::released,[&]() {
+        onLoadShape(this->ui->lineEdit_filePath->text()); });
+    connect(this->ui->pushButton_Bottle, &QPushButton::released,[&]() {
+        onLoadBottle(); });
+    connect(this->ui->pushButton_SwitchEdgeVisibility, &QPushButton::released,[&]() {
+        onSwitchEdgeVisibility(); });
 
 }
 

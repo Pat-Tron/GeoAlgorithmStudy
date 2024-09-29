@@ -10,7 +10,7 @@
 class Bottle {
     // https://dev.opencascade.org/doc/overview/html/occt__tutorial.html
 public:
-    Bottle(double height, double width, double thickness);
+    explicit Bottle(double height=70., double width=50., double thickness=22.);
     std::shared_ptr<TopoDS_Shape> mainShapePtr;
 };
 

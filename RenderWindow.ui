@@ -127,6 +127,28 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="pushButton_SwitchEdgeVisibility">
+            <property name="styleSheet">
+             <string notr="true">text-align : left;</string>
+            </property>
+            <property name="text">
+             <string> Edge Visibility</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Load Shape</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
            <widget class="QLineEdit" name="lineEdit_filePath">
             <property name="font">
              <font>
@@ -140,17 +162,44 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_LoadBunny">
-            <property name="styleSheet">
-             <string notr="true">text-align : left;</string>
-            </property>
-            <property name="text">
-             <string> Load Shape</string>
-            </property>
+           <widget class="QWidget" name="widget_2" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="4,1">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="pushButton_LoadShape">
+               <property name="font">
+                <font>
+                 <pointsize>14</pointsize>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">text-align : left;</string>
+               </property>
+               <property name="text">
+                <string> Load Shape</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_Bottle">
+               <property name="text">
+                <string>Bottle</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
-          </item>
-          <item>
-           <widget class="QWidget" name="widget" native="true"/>
           </item>
          </layout>
         </widget>

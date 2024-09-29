@@ -4,6 +4,7 @@
 
 #include "VTKViewer.h"
 
+
 #ifndef GEOALGORITHMSTUDY_QRENDERWINDOW_H
 #define GEOALGORITHMSTUDY_QRENDERWINDOW_H
 
@@ -36,6 +37,8 @@ public slots:
     void onSwitchProjection();
     void onLoadShape(QString path);
     void onResetCamera();
+    void onLoadBottle();
+    void onSwitchEdgeVisibility();
 };
 
 

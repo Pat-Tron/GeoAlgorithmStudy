@@ -1,27 +1,19 @@
 // OCCT
-#include <BRepBuilderAPI_MakeShape.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
 
 // VTK Viewer
 #include "VTKViewer.h"
 
-// STD
-#include <vector>
-#include <memory>
-
 // Qt
 #include <QVTKOpenGLNativeWidget.h>
 #include "QRenderWindow.h"
 
-// Tutorials
-#include "tutorials/01_bottle.h"
 
 int main(int argc, char** argv)
 {
     vtkObject::GlobalWarningDisplayOff();
     VTKViewer viewer;
     viewer.SetPipeline();
-    viewer.SetShape(Bottle(70., 50., 22.).mainShapePtr);
 
     // QT Stuff
     QSurfaceFormat::setDefaultFormat(QVTKOpenGLNativeWidget::defaultFormat());
