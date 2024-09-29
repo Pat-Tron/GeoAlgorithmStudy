@@ -90,9 +90,15 @@ public:
         camera->SetViewUp(0, 0, 1);
     }
 
-    void AddShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) const {
+    void SetShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) const {
+        if(!shapePtr) {
+            std::cout << "shapePtr is invalid!" << std::endl;
+            return;
+        }
         DS->SetShape(new IVtkOCC_Shape(*shapePtr));
+    }
 
+    void SetPipeline() const {
         DMFilter->AddInputConnection(DS->GetOutputPort());
         DMFilter->SetDisplayMode(DM_Shading);
 
@@ -122,14 +128,6 @@ public:
             case 1: projection = 0; camera->ParallelProjectionOff();
                 return " Projection: Perspective";
             default: return "";
-        }
-//        renderer->GetActiveCamera()->SetParallelScale(10);
-//        renderer->GetActiveCamera()->SetClippingRange(-1000, 1000);
-    }
-
-    void AddShapes(std::vector<std::shared_ptr<TopoDS_Shape>> & shapePtrs) {
-        for (const auto & shapePtr : shapePtrs) {
-            AddShape(shapePtr);
         }
     }
 

@@ -31,9 +31,11 @@ private:
 public slots:
     void slotExit();
 
-    friend void SwitchInteractorStyle(QRenderWindow *qw);
-    friend void SwitchDisplayMode(QRenderWindow *qw);
-    friend void SwitchProjection(QRenderWindow *qw);
+    void onSwitchInteractorStyle();
+    void onSwitchDisplayMode();
+    void onSwitchProjection();
+    void onLoadShape(QString path);
+    void onResetCamera();
 };
 
 

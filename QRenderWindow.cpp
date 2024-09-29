@@ -1,23 +1,41 @@
 #include "QRenderWindow.h"
 #include <ui_RenderWindow.h>
+
 #include "VTKViewer.h"
+#include "DDGStructure.h"
 
-
-void SwitchInteractorStyle(QRenderWindow *qw) {
-    auto style = qw->viewer.GetSwitchStyle();
-    qw->ui->qvtkWidget->interactor()->SetInteractorStyle(std::get<1>(style));
-    qw->ui->pushButton_CamStyle->setText(std::get<0>(style));
+void QRenderWindow::onSwitchInteractorStyle() {
+    auto style = this->viewer.GetSwitchStyle();
+    this->ui->qvtkWidget->interactor()->SetInteractorStyle(std::get<1>(style));
+    this->ui->pushButton_CamStyle->setText(std::get<0>(style));
 }
 
-void SwitchDisplayMode(QRenderWindow *qw) {
-    qw->ui->pushButton_SwitchDisplayMode->setText(qw->viewer.SwitchDisplayMode());
-    qw->ui->qvtkWidget->renderWindow()->Render();
+void QRenderWindow::onSwitchDisplayMode() {
+    this->ui->pushButton_SwitchDisplayMode->setText(this->viewer.SwitchDisplayMode());
+    this->ui->qvtkWidget->renderWindow()->Render();
 }
 
-void SwitchProjection(QRenderWindow *qw) {
-    qw->ui->pushButton_SwitchProjection->setText(qw->viewer.SwitchProjection());
-    qw->viewer.ResetCamera();
-    qw->ui->qvtkWidget->renderWindow()->Render();
+void QRenderWindow::onSwitchProjection() {
+    this->ui->pushButton_SwitchProjection->setText(this->viewer.SwitchProjection());
+    this->viewer.ResetCamera();
+    this->ui->qvtkWidget->renderWindow()->Render();
+}
+
+void QRenderWindow::onResetCamera() {
+    viewer.ResetCamera();
+    this->ui->qvtkWidget->renderWindow()->Render();
+}
+
+void QRenderWindow::onLoadShape(QString path) {
+    DDGStructure bunny(path.toStdString());
+    if (bunny.shapePtr) {
+        this->ui->textBrowser->setText("Read shape successfully!");
+        viewer.SetShape(bunny.shapePtr);
+        onResetCamera();
+    } else {
+        path.prepend("Failed to load shape from\n");
+        this->ui->textBrowser->setText(path);
+    }
 }
 
 QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
@@ -34,21 +52,21 @@ QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
     viewer.orientationWidget->InteractiveOff();
 
     // Initialize interactor style.
-    SwitchInteractorStyle(this);
+    onSwitchInteractorStyle();
 
     // Initialize signal slot.
     connect(this->ui->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
     connect(this->ui->pushButton_CamStyle, &QPushButton::released,
-            [&]() { SwitchInteractorStyle(this); });
+            [&]() { onSwitchInteractorStyle(); });
     connect(this->ui->pushButton_CamReset, &QPushButton::released,
-            [&]() {
-        viewer.ResetCamera();
-        this->ui->qvtkWidget->renderWindow()->Render();
-    });
+            [&]() { onResetCamera(); });
     connect(this->ui->pushButton_SwitchDisplayMode, &QPushButton::released,
-            [&]() { SwitchDisplayMode(this); });
+            [&]() { onSwitchDisplayMode(); });
     connect(this->ui->pushButton_SwitchProjection, &QPushButton::released,
-            [&]() { SwitchProjection(this); });
+            [&]() { onSwitchProjection(); });
+    connect(this->ui->pushButton_LoadBunny, &QPushButton::released,
+            [&]() { onLoadShape(this->ui->lineEdit_filePath->text()); });
+
 }
 
 

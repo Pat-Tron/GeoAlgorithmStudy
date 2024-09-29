@@ -122,12 +122,60 @@
              <string notr="true">text-align : left;</string>
             </property>
             <property name="text">
-             <string> SwitchProjection</string>
+             <string> Projection: Perspective</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_filePath">
+            <property name="font">
+             <font>
+              <family>Consolas</family>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>..\DDG\testData\bunny.obj</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_LoadBunny">
+            <property name="styleSheet">
+             <string notr="true">text-align : left;</string>
+            </property>
+            <property name="text">
+             <string> Load Shape</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QWidget" name="widget" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>150</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Info</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QTextBrowser" name="textBrowser">
+            <property name="font">
+             <font>
+              <family>Consolas</family>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

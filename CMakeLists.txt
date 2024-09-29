@@ -15,6 +15,8 @@ add_executable(${PROJECT_NAME} WIN32
     QRenderWindow.h
     QRenderWindow.cpp
     RenderWindow.ui
+    DDGStructure.cpp
+    DDGStructure.h
 )
 
 # VTK
