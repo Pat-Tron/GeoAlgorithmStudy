@@ -104,13 +104,8 @@ public:
         vtkNew<vtkLight> light;
         light->SetDirectionAngle(25, -10);
         light->SetLightTypeToCameraLight();
+        light->SetIntensity(0.8);
         ren->AddLight(light);
-
-        vtkNew<vtkLight> backLight;
-        backLight->SetDirectionAngle(-25, 90);
-        backLight->SetLightTypeToCameraLight();
-        backLight->SetColor(0.117, 0.871, 0.384);
-        ren->AddLight(backLight);
     }
 
     void ResetCamera() {
@@ -134,6 +129,8 @@ public:
         vtkNew<vtkPolyDataMapper> mapper;
         mapper->SetInputConnection(DMFilter->GetOutputPort());
         mainActor->SetMapper(mapper);
+        mainActor->GetProperty()->SetAmbient(0.25);
+        mainActor->GetProperty()->SetEdgeColor(199/255., 125/255., 85/255.);
 
         ren->AddActor(mainActor);
     }
