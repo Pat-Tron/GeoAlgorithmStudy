@@ -1,4 +1,5 @@
 #include "QRenderWindow.h"
+#include <QFileDialog.h>
 #include <ui_RenderWindow.h>
 
 #include "VTKViewer.h"
@@ -47,6 +48,11 @@ void QRenderWindow::onSwitchEdgeVisibility() {
     viewer.SwitchEdgeVisibility();
     this->ui->qvtkWidget->renderWindow()->Render();
 }
+void QRenderWindow::onBrowse() {
+    QString dir = this->ui->lineEdit_filePath->text();
+    QString fileName = QFileDialog::getOpenFileName(this, "", dir);
+    this->ui->lineEdit_filePath->setText(fileName);
+}
 
 QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
         : QMainWindow(parent), ui(new Ui::QRenderWindow), viewer(viewer){
@@ -80,7 +86,8 @@ QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
         onLoadBottle(); });
     connect(this->ui->pushButton_SwitchEdgeVisibility, &QPushButton::released,[&]() {
         onSwitchEdgeVisibility(); });
-
+    connect(this->ui->pushButton_Browse, &QPushButton::released,[&]() {
+        onBrowse(); });
 }
 
 

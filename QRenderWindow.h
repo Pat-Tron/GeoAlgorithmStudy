@@ -39,6 +39,7 @@ public slots:
     void onResetCamera();
     void onLoadBottle();
     void onSwitchEdgeVisibility();
+    void onBrowse();
 };
 
 
