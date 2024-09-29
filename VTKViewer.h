@@ -106,6 +106,11 @@ public:
         light->SetLightTypeToCameraLight();
         light->SetIntensity(0.8);
         ren->AddLight(light);
+
+        // Picker
+//        picker->SetRenderer(ren);
+//        picker->SetSelectionMode(SM_Edge);
+//        aPicker->SetSelectionMode(aShape, SM_Edge, false);
     }
 
     void ResetCamera() {
@@ -195,6 +200,7 @@ public:
     vtkNew<vtkRenderer> ren;
     vtkNew<vtkGenericOpenGLRenderWindow> renWin;
     vtkNew<vtkOrientationMarkerWidget> orientationWidget;
+//    vtkNew<vtk> picker;
     Bottle bottle;
 };
 

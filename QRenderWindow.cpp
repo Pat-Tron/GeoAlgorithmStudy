@@ -1,9 +1,10 @@
 #include "QRenderWindow.h"
-#include <QFileDialog.h>
+#include <QFileDialog>
 #include <ui_RenderWindow.h>
 
 #include "VTKViewer.h"
 #include "DDGStructure.h"
+
 
 void QRenderWindow::onSwitchInteractorStyle() {
     auto style = this->viewer.GetSwitchStyle();
@@ -34,8 +35,8 @@ void QRenderWindow::onLoadShape(QString path) {
         viewer.SetShape(bunny.shapePtr);
         onResetCamera();
     } else {
-        path.prepend("Failed to load shape from\n");
-        this->ui->textBrowser->setText(path);
+        path.prepend("Failed to load shape from: ");
+        this->ui->textBrowser->append(path);
     }
 }
 
