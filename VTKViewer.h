@@ -18,6 +18,7 @@
 #include <vtkCamera.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkInteractorStyleTerrain.h>
+#include <vtkPointPicker.h>
 
 // IVtk
 #include <IVtkTools_ShapeDataSource.hxx>
@@ -27,13 +28,14 @@
 // OCCT
 #include <BRepBuilderAPI_MakeShape.hxx>
 
-// Tutorials
-#include "tutorials/01_bottle.h"
-
 // STD
 #include <vector>
 #include <memory>
 #include <tuple>
+
+// Project
+#include "tutorials/01_bottle.h"
+#include "MouseInteractorStyle.h"
 
 #ifndef GEOALGORITHMSTUDY_VTKVIEWER_H
 #define GEOALGORITHMSTUDY_VTKVIEWER_H
@@ -106,11 +108,6 @@ public:
         light->SetLightTypeToCameraLight();
         light->SetIntensity(0.8);
         ren->AddLight(light);
-
-        // Picker
-//        picker->SetRenderer(ren);
-//        picker->SetSelectionMode(SM_Edge);
-//        aPicker->SetSelectionMode(aShape, SM_Edge, false);
     }
 
     void ResetCamera() {
@@ -173,24 +170,31 @@ public:
         }
     }
 
-    std::tuple<const char *, vtkInteractorStyle*> GetSwitchStyle() {
-        static InteractorStyle is { InteractorStyle::Trackball };
-        switch (is) {
-            case InteractorStyle::Trackball:
-                is = InteractorStyle::Terrain;
-                return std::make_tuple<const char *, vtkInteractorStyle*>(
-                        " Current Inter Style: Terrain", styleTerrain);
-            case InteractorStyle::Terrain:
-                is = InteractorStyle::Trackball;
-                return std::make_tuple<const char *, vtkInteractorStyle*>(
-                    " Current Inter Style: Trackball", styleTrackball);
-            default: return std::make_tuple<const char *, vtkInteractorStyle*>(" Unknown", nullptr);
+    const char * SwitchInteractorStyle() {
+        static InteractorStyle is { InteractorStyle::Terrain };
+        if (is == InteractorStyle::Trackball) {
+            is = InteractorStyle::Terrain;
+            currentStyle = styleTerrain;
+            return " Interaction Style: Terrain";
+        } else {
+            is = InteractorStyle::Trackball;
+            currentStyle = styleTrackball;
+            return " Interaction Style: Trackball";
         }
+    }
+
+    vtkInteractorStyle* SwitchPicker() {
+        static bool pickerSwitch { false };
+        pickerSwitch = !pickerSwitch;
+        if (pickerSwitch) return mouseStyle;
+        else return currentStyle;
     }
 
 private:
     vtkNew<vtkInteractorStyleTerrain> styleTerrain;
     vtkNew<vtkInteractorStyleTrackballCamera> styleTrackball;
+    vtkNew<MouseInteractorStyle> mouseStyle;
+
     vtkNew<vtkCamera> camera;
     vtkNew<IVtkTools_ShapeDataSource> DS;
     vtkNew<IVtkTools_DisplayModeFilter> DMFilter;
@@ -200,7 +204,8 @@ public:
     vtkNew<vtkRenderer> ren;
     vtkNew<vtkGenericOpenGLRenderWindow> renWin;
     vtkNew<vtkOrientationMarkerWidget> orientationWidget;
-//    vtkNew<vtk> picker;
+    vtkNew<vtkPointPicker> pointPicker;
+    vtkInteractorStyle * currentStyle = styleTerrain;
     Bottle bottle;
 };
 

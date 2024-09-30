@@ -31,15 +31,8 @@ private:
 
 public slots:
     void slotExit();
-
-    void onSwitchInteractorStyle();
-    void onSwitchDisplayMode();
-    void onSwitchProjection();
-    void onLoadShape(QString path);
     void onResetCamera();
-    void onLoadBottle();
-    void onSwitchEdgeVisibility();
-    void onBrowse();
+    void onLoadShape(QString path);
 };
 
 
