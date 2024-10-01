@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 {
     vtkObject::GlobalWarningDisplayOff();
     VTKViewer viewer;
-    viewer.SetPipeline();
+    viewer.setPipeline();
 
     // QT Stuff
     QSurfaceFormat::setDefaultFormat(QVTKOpenGLNativeWidget::defaultFormat());

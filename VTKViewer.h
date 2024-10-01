@@ -36,6 +36,7 @@
 // Project
 #include "tutorials/01_bottle.h"
 #include "MouseInteractorStyle.h"
+#include "Signals.h"
 
 #ifndef GEOALGORITHMSTUDY_VTKVIEWER_H
 #define GEOALGORITHMSTUDY_VTKVIEWER_H
@@ -57,6 +58,10 @@ enum class InteractorStyle
 class VTKViewer {
 public:
     VTKViewer() {
+        //Initialize signal sender
+        pickerSignalSender = std::make_shared<PickerSignalSender>();
+        mouseStyle->SetSender(pickerSignalSender);
+
         // Background color
         vtkNew<vtkNamedColors> colors;
         const auto bottomColor = colors->GetColor3d("black");
@@ -110,12 +115,12 @@ public:
         ren->AddLight(light);
     }
 
-    void ResetCamera() {
+    void resetCamera() {
         ren->ResetCameraScreenSpace(0.8);
         camera->SetViewUp(0, 0, 1);
     }
 
-    void SetShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) const {
+    void setShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) const {
         if(!shapePtr) {
             std::cout << "shapePtr is invalid!" << std::endl;
             return;
@@ -123,8 +128,8 @@ public:
         DS->SetShape(new IVtkOCC_Shape(*shapePtr));
     }
 
-    void SetPipeline() const {
-        SetShape(bottle.mainShapePtr);
+    void setPipeline() const {
+        setShape(bottle.mainShapePtr);
         DMFilter->AddInputConnection(DS->GetOutputPort());
         DMFilter->SetDisplayMode(DM_Shading);
 
@@ -137,14 +142,14 @@ public:
         ren->AddActor(mainActor);
     }
 
-    void SwitchEdgeVisibility() {
+    void switchEdgeVisibility() {
         static bool switcher {true};
         if (switcher) mainActor->GetProperty()->EdgeVisibilityOn();
         else mainActor->GetProperty()->EdgeVisibilityOff();
         switcher = !switcher;
     }
 
-    const char * SwitchDisplayMode() {
+    const char * switchDisplayMode() {
         static IVtk_DisplayMode dm = DM_Shading;
         dm = dm == DM_Shading ? DM_Wireframe : DM_Shading;
         DMFilter->SetDisplayMode(dm);
@@ -155,7 +160,7 @@ public:
         }
     }
 
-    const char * SwitchProjection() {
+    const char * switchProjection() {
         static ProjectionMode pm { ProjectionMode::Perspective };
         switch (pm) {
             case ProjectionMode::Perspective:
@@ -170,7 +175,7 @@ public:
         }
     }
 
-    const char * SwitchInteractorStyle() {
+    const char * switchInteractorStyle() {
         static InteractorStyle is { InteractorStyle::Terrain };
         if (is == InteractorStyle::Trackball) {
             is = InteractorStyle::Terrain;
@@ -183,7 +188,7 @@ public:
         }
     }
 
-    vtkInteractorStyle* SwitchPicker() {
+    vtkInteractorStyle* switchPicker() {
         static bool pickerSwitch { false };
         pickerSwitch = !pickerSwitch;
         if (pickerSwitch) return mouseStyle;
@@ -206,7 +211,9 @@ public:
     vtkNew<vtkOrientationMarkerWidget> orientationWidget;
     vtkNew<vtkPointPicker> pointPicker;
     vtkInteractorStyle * currentStyle = styleTerrain;
+
     Bottle bottle;
+    std::shared_ptr<PickerSignalSender> pickerSignalSender;
 };
 
 #endif //GEOALGORITHMSTUDY_VTKVIEWER_H

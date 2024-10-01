@@ -23,6 +23,8 @@ class QRenderWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit QRenderWindow(VTKViewer & viewer, QWidget* parent = nullptr);
+    void appendInfo(QString & info);
+    void appendInfo(const char * info);
     ~QRenderWindow() override;
 
 private:
@@ -30,7 +32,7 @@ private:
     VTKViewer & viewer;
 
 public slots:
-    void slotExit();
+    void slotExit() { qApp->exit(); }
     void onResetCamera();
     void onLoadShape(QString path);
 };

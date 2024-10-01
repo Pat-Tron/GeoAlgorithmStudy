@@ -1,4 +1,4 @@
-#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkInteractorStyleTerrain.h>
 #include <vtkNew.h>
 #include <vtkPointPicker.h>
 #include <vtkRendererCollection.h>
@@ -6,18 +6,20 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkObjectFactory.h>
 
+#include "Signals.h"
 
 #ifndef GEOALGORITHMSTUDY_MouseInteractorStyle_H
 #define GEOALGORITHMSTUDY_MouseInteractorStyle_H
 
 
-class MouseInteractorStyle : public vtkInteractorStyleTrackballCamera{
+class MouseInteractorStyle : public vtkInteractorStyleTerrain{
 public:
     static MouseInteractorStyle * New();
-    vtkTypeMacro(MouseInteractorStyle , vtkInteractorStyleTrackballCamera);
+    vtkTypeMacro(MouseInteractorStyle , vtkInteractorStyleTerrain);
 
     void OnLeftButtonDown() override
     {
+
         std::cout << "Picking pixel: "
             << this->Interactor->GetEventPosition()[0] << " "
             << this->Interactor->GetEventPosition()[1]
@@ -30,15 +32,21 @@ public:
                 this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
         double picked[3];
         this->Interactor->GetPicker()->GetPickPosition(picked);
-        std::cout << "Picked value: "
-            << picked[0] << " "
-            << picked[1] << " "
-            << picked[2]
-            << std::endl;
+
+        pickerSignalSender->info = "Picked value: " +
+                QString::number(picked[0]) + " ," +
+                QString::number(picked[1]) + " ," +
+                QString::number(picked[2]);
+        pickerSignalSender->onPointSelected();
 
         // Forward events.
-        vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
+        vtkInteractorStyleTerrain::OnLeftButtonDown();
     }
+
+    void SetSender(std::shared_ptr<PickerSignalSender> sender) { pickerSignalSender = sender; }
+
+private:
+    std::shared_ptr<PickerSignalSender> pickerSignalSender;
 };
 
 #endif //GEOALGORITHMSTUDY_MouseInteractorStyle_H

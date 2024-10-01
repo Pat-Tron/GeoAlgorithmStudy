@@ -7,8 +7,8 @@ set(CMAKE_AUTOUIC ON)
 include(ThirdLibraryPaths.cmake)
 
 # WIN32 indicate the exe don't display console window.
-add_executable(${PROJECT_NAME}
-#add_executable(${PROJECT_NAME} WIN32
+#add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} WIN32
     main.cpp
     VTKViewer.h
     tutorials/01_bottle.h
@@ -20,6 +20,7 @@ add_executable(${PROJECT_NAME}
     DDGStructure.h
     MouseInteractorStyle.h
     MouseInteractorStyle.cpp
+    Signals.h
 )
 
 # VTK
