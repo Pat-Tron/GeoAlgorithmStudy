@@ -19,7 +19,8 @@ void QRenderWindow::onResetCamera() {
     ui->qvtkWidget->renderWindow()->Render();
 }
 
-void QRenderWindow::onLoadShape(QString path) {
+void QRenderWindow::onLoadShape() {
+    QString path = ui->lineEdit_filePath->text();
     DDGStructure bunny(path.toStdString());
     if (bunny.shapePtr) {
         appendInfo("Load shape successfully!");
@@ -46,9 +47,6 @@ QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
     // Initialize interactor style.
     ui->qvtkWidget->interactor()->SetInteractorStyle(viewer.currentStyle);
 
-    // Set picker.
-    ui->qvtkWidget->interactor()->SetPicker(viewer.pointPicker);
-
     // Initialize signal slot.
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
 
@@ -69,7 +67,7 @@ QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
         ui->qvtkWidget->renderWindow()->Render(); });
 
     connect(ui->pushButton_LoadShape, &QPushButton::released,[&]() {
-        onLoadShape(ui->lineEdit_filePath->text()); });
+        onLoadShape(); });
 
     connect(ui->pushButton_Bottle, &QPushButton::released,[&]() {
         viewer.setShape(viewer.bottle.mainShapePtr);
@@ -87,8 +85,8 @@ QRenderWindow::QRenderWindow(VTKViewer & viewer, QWidget* parent)
     connect(ui->pushButton_Picker, &QPushButton::released,[&]() {
         ui->qvtkWidget->interactor()->SetInteractorStyle(viewer.switchPicker()); });
 
-    connect(viewer.pickerSignalSender.get(), &PickerSignalSender::pointSelected, [&](){
-        appendInfo(viewer.pickerSignalSender->info); });
+    connect(viewer.printInfoSignalSender.get(), &PrintInfoSignalSender::printInfo, [&](){
+        appendInfo(viewer.printInfoSignalSender->info); });
 }
 
 

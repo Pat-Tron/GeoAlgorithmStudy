@@ -34,7 +34,7 @@ private:
 public slots:
     void slotExit() { qApp->exit(); }
     void onResetCamera();
-    void onLoadShape(QString path);
+    void onLoadShape();
 };
 
 

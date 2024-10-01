@@ -19,6 +19,9 @@
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkInteractorStyleTerrain.h>
 #include <vtkPointPicker.h>
+#include <vtkCellPicker.h>
+#include <vtkIdFilter.h>
+#include <vtkDataSetSurfaceFilter.h>
 
 // IVtk
 #include <IVtkTools_ShapeDataSource.hxx>
@@ -58,9 +61,9 @@ enum class InteractorStyle
 class VTKViewer {
 public:
     VTKViewer() {
-        //Initialize signal sender
-        pickerSignalSender = std::make_shared<PickerSignalSender>();
-        mouseStyle->SetSender(pickerSignalSender);
+        //Initialize Picker
+        printInfoSignalSender = std::make_shared<PrintInfoSignalSender>();
+        mouseStyle->SetSender(printInfoSignalSender);
 
         // Background color
         vtkNew<vtkNamedColors> colors;
@@ -120,22 +123,32 @@ public:
         camera->SetViewUp(0, 0, 1);
     }
 
-    void setShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) const {
+    void setShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) {
         if(!shapePtr) {
             std::cout << "shapePtr is invalid!" << std::endl;
             return;
         }
         DS->SetShape(new IVtkOCC_Shape(*shapePtr));
+        polyData = DS->GetOutput();
+
+        printInfoSignalSender->info = QString("Data elements stats:") +
+                "\nPoint:  " + QString::number(polyData->GetNumberOfElements(vtkDataObject::POINT)) +
+                "\nCell:   " + QString::number(polyData->GetNumberOfElements(vtkDataObject::CELL)) +
+                "\nField:  " + QString::number(polyData->GetNumberOfElements(vtkDataObject::FIELD)) +
+                "\nVertex: " + QString::number(polyData->GetNumberOfElements(vtkDataObject::VERTEX)) +
+                "\nEdge:   " + QString::number(polyData->GetNumberOfElements(vtkDataObject::EDGE));
+        printInfoSignalSender->send();
     }
 
-    void setPipeline() const {
+    void setPipeline() {
         setShape(bottle.mainShapePtr);
+
         DMFilter->AddInputConnection(DS->GetOutputPort());
         DMFilter->SetDisplayMode(DM_Shading);
 
-        vtkNew<vtkPolyDataMapper> mapper;
         mapper->SetInputConnection(DMFilter->GetOutputPort());
         mainActor->SetMapper(mapper);
+
         mainActor->GetProperty()->SetAmbient(0.25);
         mainActor->GetProperty()->SetEdgeColor(199/255., 125/255., 85/255.);
 
@@ -191,7 +204,10 @@ public:
     vtkInteractorStyle* switchPicker() {
         static bool pickerSwitch { false };
         pickerSwitch = !pickerSwitch;
-        if (pickerSwitch) return mouseStyle;
+        if (pickerSwitch) {
+            mouseStyle->polyDataPtr = polyData;
+            return mouseStyle;
+        }
         else return currentStyle;
     }
 
@@ -204,16 +220,19 @@ private:
     vtkNew<IVtkTools_ShapeDataSource> DS;
     vtkNew<IVtkTools_DisplayModeFilter> DMFilter;
     vtkNew<vtkActor> mainActor;
+    vtkNew<vtkPolyDataMapper> mapper;
 
 public:
     vtkNew<vtkRenderer> ren;
     vtkNew<vtkGenericOpenGLRenderWindow> renWin;
     vtkNew<vtkOrientationMarkerWidget> orientationWidget;
     vtkNew<vtkPointPicker> pointPicker;
+    vtkNew<vtkCellPicker> cellPicker;
     vtkInteractorStyle * currentStyle = styleTerrain;
+    vtkPolyData* polyData;
 
     Bottle bottle;
-    std::shared_ptr<PickerSignalSender> pickerSignalSender;
+    std::shared_ptr<PrintInfoSignalSender> printInfoSignalSender;
 };
 
 #endif //GEOALGORITHMSTUDY_VTKVIEWER_H

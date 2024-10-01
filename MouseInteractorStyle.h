@@ -1,10 +1,19 @@
 #include <vtkInteractorStyleTerrain.h>
 #include <vtkNew.h>
-#include <vtkPointPicker.h>
+#include <vtkCellPicker.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkObjectFactory.h>
+#include <vtkPolyData.h>
+#include <vtkNamedColors.h>
+#include <vtkSelection.h>
+#include <vtkSelectionNode.h>
+#include <vtkExtractSelection.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkDataSetMapper.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
 
 #include "Signals.h"
 
@@ -16,37 +25,71 @@ class MouseInteractorStyle : public vtkInteractorStyleTerrain{
 public:
     static MouseInteractorStyle * New();
     vtkTypeMacro(MouseInteractorStyle , vtkInteractorStyleTerrain);
+    MouseInteractorStyle() {
+        picker->SetTolerance(0.0005);
+        vtkNew<vtkNamedColors> colors;
+        highlightColor = colors->GetColor3d("spring_green_medium");
+    }
 
-    void OnLeftButtonDown() override
-    {
+    void OnLeftButtonDown() override {
+        int* pos = this->GetInteractor()->GetEventPosition();
+        picker->Pick(pos[0], pos[1], 0,
+                     this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
 
-        std::cout << "Picking pixel: "
-            << this->Interactor->GetEventPosition()[0] << " "
-            << this->Interactor->GetEventPosition()[1]
-            << std::endl;
+        if (picker->GetCellId() != -1)
+        {
+            vtkNew<vtkIdTypeArray> ids;
+            ids->SetNumberOfComponents(1);
+            ids->InsertNextValue(picker->GetCellId());
 
-        this->Interactor->GetPicker()->Pick(
-                this->Interactor->GetEventPosition()[0],
-                this->Interactor->GetEventPosition()[1],
-                0, // always zero.
-                this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
-        double picked[3];
-        this->Interactor->GetPicker()->GetPickPosition(picked);
+            vtkNew<vtkSelectionNode> selectionNode;
+            selectionNode->SetFieldType(vtkSelectionNode::CELL);
+            selectionNode->SetContentType(vtkSelectionNode::INDICES);
+            selectionNode->SetSelectionList(ids);
 
-        pickerSignalSender->info = "Picked value: " +
-                QString::number(picked[0]) + " ," +
-                QString::number(picked[1]) + " ," +
-                QString::number(picked[2]);
-        pickerSignalSender->onPointSelected();
+            vtkNew<vtkSelection> selection;
+            selection->AddNode(selectionNode);
+
+//            vtkNew<vtkExtractSelection> extractSelection;
+//            extractSelection->SetInputData(0, this->polyData);
+//            extractSelection->SetInputData(1, selection);
+//            extractSelection->Update();
+//
+//            // In selection
+//            vtkNew<vtkUnstructuredGrid> selected;
+//            selected->ShallowCopy(extractSelection->GetOutput());
+//            selectedMapper->SetInputData(selected);
+//            selectedActor->SetMapper(selectedMapper);
+//            selectedActor->GetProperty()->EdgeVisibilityOn();
+//            selectedActor->GetProperty()->SetColor(highlightColor.GetData());
+//            selectedActor->GetProperty()->SetLineWidth(3);
+//
+//            this->Interactor->GetRenderWindow()
+//                    ->GetRenderers()
+//                    ->GetFirstRenderer()
+//                    ->AddActor(selectedActor);
+            int cellId = picker->GetCellId();
+            int cellType = polyDataPtr->GetCellType(cellId);
+            printInfoSignalSender->info = "Picked cell: " + QString::number(cellId) +
+                    " Type: " + QString::number(cellType);
+            printInfoSignalSender->send();
+        }
 
         // Forward events.
         vtkInteractorStyleTerrain::OnLeftButtonDown();
     }
 
-    void SetSender(std::shared_ptr<PickerSignalSender> sender) { pickerSignalSender = sender; }
+    void SetSender(std::shared_ptr<PrintInfoSignalSender> sender) { printInfoSignalSender = sender; }
+
+public:
+    vtkPolyData * polyDataPtr;
+    vtkNew<vtkDataSetMapper> selectedMapper;
+    vtkNew<vtkActor> selectedActor;
 
 private:
-    std::shared_ptr<PickerSignalSender> pickerSignalSender;
+    std::shared_ptr<PrintInfoSignalSender> printInfoSignalSender;
+    vtkNew<vtkCellPicker> picker;
+    vtkColor3d highlightColor;
 };
 
 #endif //GEOALGORITHMSTUDY_MouseInteractorStyle_H

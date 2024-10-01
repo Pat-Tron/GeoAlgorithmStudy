@@ -4,16 +4,16 @@
 #define GEOALGORITHMSTUDY_SIGNALS_H
 
 
-class PickerSignalSender : public QObject {
+class PrintInfoSignalSender : public QObject {
 Q_OBJECT
 public:
     QString info;
-    void onPointSelected() {
-        emit this->pointSelected();
+    void send() {
+        emit this->printInfo();
     }
 
 signals:
-    void pointSelected();
+    void printInfo();
 };
 
 
