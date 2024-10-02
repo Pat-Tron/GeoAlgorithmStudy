@@ -321,7 +321,7 @@
                </font>
               </property>
               <property name="text">
-               <string>..\DDG\testData</string>
+               <string>..\DDG\testData\isoSphere.obj</string>
               </property>
              </widget>
             </item>

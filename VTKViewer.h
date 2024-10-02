@@ -219,7 +219,7 @@ public:
         static bool pickerSwitch { false };
         pickerSwitch = !pickerSwitch;
         if (pickerSwitch) {
-            mouseStyle->polyDataPtr = polyData;
+            mouseStyle->resetConnection(ren, polyData);
             return mouseStyle;
         }
         else return currentStyle;

@@ -14,6 +14,7 @@
 #include <vtkDataSetMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
+#include <vtkAssemblyPath.h>
 
 #include "Signals.h"
 
@@ -29,47 +30,39 @@ public:
         picker->SetTolerance(0.0005);
         vtkNew<vtkNamedColors> colors;
         highlightColor = colors->GetColor3d("spring_green_medium");
+
+        ids->SetNumberOfComponents(10);
+        selectionNode->SetFieldType(vtkSelectionNode::CELL);
+        selectionNode->SetContentType(vtkSelectionNode::INDICES);
+        selectionNode->SetSelectionList(ids);
+        selection->AddNode(selectionNode);
+        extractSelection->SetInputData(1, selection);
+        selectedMapper->SetInputData(highlightedSelected);
+        selectedActor->SetMapper(selectedMapper);
+        selectedActor->GetProperty()->EdgeVisibilityOn();
+        selectedActor->GetProperty()->SetColor(highlightColor.GetData());
+        selectedActor->GetProperty()->SetLineWidth(7);
+    }
+
+    void resetConnection(vtkRenderer * ren, vtkPolyData * _polyDataPtr) {
+        renderer = ren;
+        renderer->AddActor(selectedActor);
+        polyDataPtr = _polyDataPtr;
+        extractSelection->SetInputData(0, this->polyDataPtr);
+        extractSelection->Update();
     }
 
     void OnLeftButtonDown() override {
         int* pos = this->GetInteractor()->GetEventPosition();
-        picker->Pick(pos[0], pos[1], 0,
-                     this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+        picker->Pick(pos[0], pos[1], 0, renderer);
 
         if (picker->GetCellId() != -1)
         {
-            vtkNew<vtkIdTypeArray> ids;
-            ids->SetNumberOfComponents(1);
-            ids->InsertNextValue(picker->GetCellId());
-
-            vtkNew<vtkSelectionNode> selectionNode;
-            selectionNode->SetFieldType(vtkSelectionNode::CELL);
-            selectionNode->SetContentType(vtkSelectionNode::INDICES);
-            selectionNode->SetSelectionList(ids);
-
-            vtkNew<vtkSelection> selection;
-            selection->AddNode(selectionNode);
-
-            vtkNew<vtkExtractSelection> extractSelection;
-            extractSelection->SetInputData(0, this->polyDataPtr);
-            extractSelection->SetInputData(1, selection);
-            extractSelection->Update();
-
-            // In selection
-            vtkNew<vtkUnstructuredGrid> selected;
-            selected->ShallowCopy(extractSelection->GetOutput());
-            selectedMapper->SetInputData(selected);
-            selectedActor->SetMapper(selectedMapper);
-            selectedActor->GetProperty()->EdgeVisibilityOn();
-            selectedActor->GetProperty()->SetColor(highlightColor.GetData());
-            selectedActor->GetProperty()->SetLineWidth(3);
-
-            this->Interactor->GetRenderWindow()
-                    ->GetRenderers()
-                    ->GetFirstRenderer()
-                    ->AddActor(selectedActor);
-
+            // aDataSet-->GetPointData（）->GetScalars（）->GetTuple（129）;
             int cellId = picker->GetCellId();
+//            ids->InsertNextValue(cellId);
+//            highlightedSelected->ShallowCopy(extractSelection->GetOutput());
+
             int cellType = polyDataPtr->GetCellType(cellId);
             printInfoSignalSender->info = "Picked cell: " + QString::number(cellId) +
                     " Type: " + QString::number(cellType);
@@ -91,6 +84,12 @@ private:
     std::shared_ptr<PrintInfoSignalSender> printInfoSignalSender;
     vtkNew<vtkCellPicker> picker;
     vtkColor3d highlightColor;
+    vtkNew<vtkSelectionNode> selectionNode;
+    vtkNew<vtkIdTypeArray> ids;
+    vtkNew<vtkSelection> selection;
+    vtkNew<vtkExtractSelection> extractSelection;
+    vtkNew<vtkUnstructuredGrid> highlightedSelected;
+    vtkRenderer * renderer;
 };
 
 #endif //GEOALGORITHMSTUDY_MouseInteractorStyle_H
