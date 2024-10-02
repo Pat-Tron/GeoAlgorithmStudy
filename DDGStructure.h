@@ -13,6 +13,7 @@ public:
         reader->SetFileName(path.c_str());
         reader->Update();
         polyData = reader->GetOutput();
+        if (polyData->GetNumberOfCells() == 0) polyData = nullptr;
     }
 
     vtkSmartPointer<vtkPolyData> polyData;
