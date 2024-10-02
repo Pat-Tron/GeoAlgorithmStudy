@@ -21,10 +21,10 @@ void QRenderWindow::onResetCamera() {
 
 void QRenderWindow::onLoadShape() {
     QString path = ui->lineEdit_filePath->text();
-    DDGStructure bunny(path.toStdString());
-    if (bunny.shapePtr) {
+    DDGStructure ddgs(path.toStdString());
+    if (ddgs.polyData) {
         appendInfo("Load shape successfully!");
-        viewer.setShape(bunny.shapePtr);
+        viewer.setShape(ddgs.polyData);
         onResetCamera();
     } else {
         appendInfo(path.prepend("Failed to load shape from: "));

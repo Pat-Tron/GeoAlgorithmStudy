@@ -27,17 +27,30 @@ add_executable(${PROJECT_NAME} WIN32
 find_package(VTK REQUIRED COMPONENTS
     CommonColor
     CommonCore
+    CommonDataModel
+
+    FiltersCore
+    FiltersExtraction
+    FiltersGeometry
     FiltersSources
+
     RenderingCore
     RenderingAnnotation
-    InteractionStyle
     RenderingContextOpenGL2
     RenderingFreeType
     RenderingGL2PSOpenGL2
     RenderingOpenGL2
+    InteractionStyle
+
     GUISupportQt
     RenderingQt
+
+    IOGeometry
+    IOLegacy
+    IOPLY
+    IOXML
 )
+
 target_link_libraries(${PROJECT_NAME} PRIVATE ${VTK_LIBRARIES})
 vtk_module_autoinit(TARGETS ${PROJECT_NAME} MODULES ${VTK_LIBRARIES})
 

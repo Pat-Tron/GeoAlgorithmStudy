@@ -50,24 +50,25 @@ public:
             vtkNew<vtkSelection> selection;
             selection->AddNode(selectionNode);
 
-//            vtkNew<vtkExtractSelection> extractSelection;
-//            extractSelection->SetInputData(0, this->polyData);
-//            extractSelection->SetInputData(1, selection);
-//            extractSelection->Update();
-//
-//            // In selection
-//            vtkNew<vtkUnstructuredGrid> selected;
-//            selected->ShallowCopy(extractSelection->GetOutput());
-//            selectedMapper->SetInputData(selected);
-//            selectedActor->SetMapper(selectedMapper);
-//            selectedActor->GetProperty()->EdgeVisibilityOn();
-//            selectedActor->GetProperty()->SetColor(highlightColor.GetData());
-//            selectedActor->GetProperty()->SetLineWidth(3);
-//
-//            this->Interactor->GetRenderWindow()
-//                    ->GetRenderers()
-//                    ->GetFirstRenderer()
-//                    ->AddActor(selectedActor);
+            vtkNew<vtkExtractSelection> extractSelection;
+            extractSelection->SetInputData(0, this->polyDataPtr);
+            extractSelection->SetInputData(1, selection);
+            extractSelection->Update();
+
+            // In selection
+            vtkNew<vtkUnstructuredGrid> selected;
+            selected->ShallowCopy(extractSelection->GetOutput());
+            selectedMapper->SetInputData(selected);
+            selectedActor->SetMapper(selectedMapper);
+            selectedActor->GetProperty()->EdgeVisibilityOn();
+            selectedActor->GetProperty()->SetColor(highlightColor.GetData());
+            selectedActor->GetProperty()->SetLineWidth(3);
+
+            this->Interactor->GetRenderWindow()
+                    ->GetRenderers()
+                    ->GetFirstRenderer()
+                    ->AddActor(selectedActor);
+
             int cellId = picker->GetCellId();
             int cellType = polyDataPtr->GetCellType(cellId);
             printInfoSignalSender->info = "Picked cell: " + QString::number(cellId) +

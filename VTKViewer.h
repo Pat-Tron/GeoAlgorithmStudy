@@ -16,12 +16,16 @@
 #include <vtkTextActor.h>
 #include <vtkLight.h>
 #include <vtkCamera.h>
+
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkInteractorStyleTerrain.h>
+
 #include <vtkPointPicker.h>
 #include <vtkCellPicker.h>
+
 #include <vtkIdFilter.h>
 #include <vtkDataSetSurfaceFilter.h>
+#include <vtkGeometryFilter.h>
 
 // IVtk
 #include <IVtkTools_ShapeDataSource.hxx>
@@ -114,13 +118,29 @@ public:
         vtkNew<vtkLight> light;
         light->SetDirectionAngle(25, -10);
         light->SetLightTypeToCameraLight();
-        light->SetIntensity(0.8);
+        light->SetIntensity(0.7);
         ren->AddLight(light);
+
+        // Actor settings
+        mainActor->GetProperty()->SetAmbient(0.25);
+        mainActor->GetProperty()->SetEdgeColor(199/255., 125/255., 85/255.);
+
+        setPipeline();
     }
 
     void resetCamera() {
         ren->ResetCameraScreenSpace(0.8);
         camera->SetViewUp(0, 0, 1);
+    }
+
+    void printStats() const {
+        printInfoSignalSender->info = QString("Data elements stats:") +
+            "\nPoint:  " + QString::number(polyData->GetNumberOfElements(vtkDataObject::POINT)) +
+            "\nCell:   " + QString::number(polyData->GetNumberOfElements(vtkDataObject::CELL)) +
+            "\nField:  " + QString::number(polyData->GetNumberOfElements(vtkDataObject::FIELD)) +
+            "\nVertex: " + QString::number(polyData->GetNumberOfElements(vtkDataObject::VERTEX)) +
+            "\nEdge:   " + QString::number(polyData->GetNumberOfElements(vtkDataObject::EDGE));
+        printInfoSignalSender->send();
     }
 
     void setShape(const std::shared_ptr<TopoDS_Shape> & shapePtr) {
@@ -130,28 +150,22 @@ public:
         }
         DS->SetShape(new IVtkOCC_Shape(*shapePtr));
         polyData = DS->GetOutput();
+        printStats();
+        geometryFilter->SetInputConnection(DMFilter->GetOutputPort());
+    }
 
-        printInfoSignalSender->info = QString("Data elements stats:") +
-                "\nPoint:  " + QString::number(polyData->GetNumberOfElements(vtkDataObject::POINT)) +
-                "\nCell:   " + QString::number(polyData->GetNumberOfElements(vtkDataObject::CELL)) +
-                "\nField:  " + QString::number(polyData->GetNumberOfElements(vtkDataObject::FIELD)) +
-                "\nVertex: " + QString::number(polyData->GetNumberOfElements(vtkDataObject::VERTEX)) +
-                "\nEdge:   " + QString::number(polyData->GetNumberOfElements(vtkDataObject::EDGE));
-        printInfoSignalSender->send();
+    void setShape(vtkPolyData * pd) {
+        polyData = pd;
+        geometryFilter->SetInputData(polyData);
+        printStats();
     }
 
     void setPipeline() {
         setShape(bottle.mainShapePtr);
-
-        DMFilter->AddInputConnection(DS->GetOutputPort());
+        DMFilter->SetInputConnection(DS->GetOutputPort());
         DMFilter->SetDisplayMode(DM_Shading);
-
-        mapper->SetInputConnection(DMFilter->GetOutputPort());
+        mapper->SetInputConnection(geometryFilter->GetOutputPort());
         mainActor->SetMapper(mapper);
-
-        mainActor->GetProperty()->SetAmbient(0.25);
-        mainActor->GetProperty()->SetEdgeColor(199/255., 125/255., 85/255.);
-
         ren->AddActor(mainActor);
     }
 
@@ -221,6 +235,7 @@ private:
     vtkNew<IVtkTools_DisplayModeFilter> DMFilter;
     vtkNew<vtkActor> mainActor;
     vtkNew<vtkPolyDataMapper> mapper;
+    vtkNew<vtkGeometryFilter> geometryFilter;
 
 public:
     vtkNew<vtkRenderer> ren;
@@ -229,7 +244,7 @@ public:
     vtkNew<vtkPointPicker> pointPicker;
     vtkNew<vtkCellPicker> cellPicker;
     vtkInteractorStyle * currentStyle = styleTerrain;
-    vtkPolyData* polyData;
+    vtkPolyData* polyData {nullptr};
 
     Bottle bottle;
     std::shared_ptr<PrintInfoSignalSender> printInfoSignalSender;
